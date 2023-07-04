@@ -39,6 +39,6 @@ Gopls is maintained by the core Go team.
 #### Community Resources
  - Go.dev
     - Main landing page for the go language to find documentation and installations/downloads.
-    - Effective Go article is highly recommended. It describes the way and patterns in which most go code is written and what are the best practices and conventions.
+    - [Effective Go](https://go.dev/doc/effective_go) article is highly recommended. It describes the way and patterns in which most go code is written and what are the best practices and conventions.
     - Also contains the Go playground which can be used to test some quick Go code.
     - go.dev/learn : Contains helpful tutorials and examples showcasing common use-cases.
