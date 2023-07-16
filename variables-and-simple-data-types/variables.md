@@ -3,7 +3,7 @@
 #### Declaration and Initialization
 Variabels in Go are declared using the keyword `var`. There are various ways to declare and initialize variables in Go - 
 
-```
+```go
 var name string         // declare variable
 var name string = "psx" // declare and initialize
 
@@ -28,7 +28,7 @@ a, b := 10, 5           // Go allows multiple variables to be initialized all at
 #### Type conversion
 Go **does not support implicit conversions between data types***. If a type conversion is required, it has to be explicit. So for instance, 
 
-```
+```go
 var i int = 5   // declare and initialize
 
 var f float32   // declare
@@ -39,7 +39,7 @@ f = float32(i)  // Have to be explicit with the intent to convert to a different
 ### Constants in Go
 Constants in Go are declared using the `const` keyword. Constants cannot change values once they are initialized and the value of the constant has to be determinable at compile time. Unlike variables constants do not need to be declared locally and so we can have unused constants in a Go program without any compile-time errors.
 
-```
+```go
 const a = 42                // implicitly typed constant 
 const name string = "psx"  // explicitly typed constant
 

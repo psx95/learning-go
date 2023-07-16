@@ -10,7 +10,7 @@ Similar to an array, but allows for custom index (or *key*) types to reference v
  - Ordering in a map is not determinant. 
 
 #### Common Map Operations in Go
-```
+```go
 // Declaring a map in Go
 var m map[string]int        // the value in the [] indicates the key type and "int" indicates value type
 fmt.Println(m)              // map[] - like slices, this indicates a nil value

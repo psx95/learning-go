@@ -7,7 +7,7 @@ Arrays in Go function exactly same like arrays in any other language. The basic 
  - Comparing two arrays of different data types or size will lead to a compile-time error in Go.
 
 #### Common Array Operations in Go
-```
+```go
 // Declaring Arrays in Go
 var arr [3]int           // array of 3 ints
 
@@ -40,7 +40,7 @@ Slices in Go are homogenous data structures similar to an array, but they are dy
 Since slices are backed by an internal array and reflects the values held in that array, any change in the underlying array will reflect a change in the slice and vice versa. 
 
 #### Common Slice Operations in Go
-```
+```go
 // Declaring Slices in Go
 var slice []int             // Unlike an array, we do not declare a size
 

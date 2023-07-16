@@ -3,7 +3,7 @@
 #### Arithmetic Operators
 Go supports all basic arithmetic operators - 
 
-```
+```go
 a, b := 10, 5       // a and b both are inferred here to be of type int
 
 // Addition
