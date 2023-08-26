@@ -27,9 +27,9 @@ func main() {
 func processOptions(choice string) {
 	switch choice {
 	case "1":
-		menu.PrintCurrentMenu()
+		menu.Print()
 	case "2":
-		menu.AddMenuItem(in)
+		menu.AddItem(in)
 	case "q":
 		fmt.Println("Exiting Application")
 	default:
