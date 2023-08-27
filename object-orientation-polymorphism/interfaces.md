@@ -77,7 +77,7 @@ f2, ok := r.(File) // Does not panic
 // The example above only checks the variable against a single type - File
 // In case we want to check for types against multiple types we can use type switch, eg -
 
-switch v :=- r.(type) {
+switch v := r.(type) {
     case File:
         // v is now a File object
     case TCPConn:
