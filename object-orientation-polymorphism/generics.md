@@ -42,3 +42,42 @@ floatAnotherArr := bar[float64](floatArr)
 // Invoking generic function bar - with a int64 type
 intAnotherArr := bar[int64](intArr)
 ```
+
+#### Creating custom type constraints in Go -
+
+There are only two builtin interfaces in go that can be used as type constraints for generics - `comparable` and `any`. This means that there maybe cases where we need custom constraint types. We can create custom type constraints in Go, which can then be used to define our generic functions -
+
+```go
+// Since type constraints for generic functions are basically interfaces, we can create a custom interface and use it as a constraint.
+// However this interface would be a litte different from the behavioral interfaces that we typically create since rather that defining
+// behavior on implementing types, such an interface will define the concrete types (basically the types that would satisfy the constraints) -
+
+// Consider the following function that adds elements in an int slice using '+' operator
+func add(arr []int64) int64 {
+    var result int64
+    for _, v := range arr {
+        result += v
+    }
+    return result
+}
+
+// In case we wish to use the same function for ints, floats and strings - we cannot use 'any' or 'comparable' type -
+// This is because the '+' operator is not defined on type 'any'
+// So we create a custom interface
+
+// contains types that have '+' operator defined on them
+// This is a type interface - uses same structure as a typical behavioral interface but contains a list of concrete types
+// separated by the '|' (pipe) operator.
+type addable interface {
+    int | float64 | string
+}
+
+// Add generic now has a type constraint 'addable' which means we can pass any of int, float64 or string to it.
+func addGeneric[V addable](s []V) V {
+    var result V
+    for _, v := range arr {
+        result += v
+    }
+    return result
+}
+```
