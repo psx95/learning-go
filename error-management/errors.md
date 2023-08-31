@@ -28,3 +28,11 @@ func main() {
     fmt.Prinltn(err2) // Wrap the first error with this one: My error
 }
 ```
+
+#### Error vs Panic
+| Error  | Panic |
+| -------| ------ |
+| Error is basically the result of an operation, this means it is handled as part of general program flow. | Panic causes the function's execution to immediately terminate and it is propagated up the call stack until it sees a `recover` method. This means it causes a major change in the control flow of the program. |
+| It is easy to discover an error since it is mentioned as a return value. By convention, it is always the last returned value | It relies on the programmer to read code and documentation to figure out if a function can panic |
+| Error implies unexpected situation in a program | Panic implies that program is unstable (undefined behavior) |
+| Errors are used more frequently | Panics are rare |
