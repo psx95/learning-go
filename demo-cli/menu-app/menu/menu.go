@@ -2,6 +2,7 @@ package menu
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"strings"
 )
@@ -23,9 +24,16 @@ func (m menu) print() {
 	}
 }
 
-func (m *menu) addItem(inputStream *bufio.Reader) {
+func (m *menu) addItem(inputStream *bufio.Reader) error {
 	fmt.Println("Enter name of Menu Item")
 	newItemName, err := inputStream.ReadString('\n')
+	newItemName = strings.TrimSpace(newItemName)
+	isDuplicate := m.checkDuplicate(newItemName)
+	if isDuplicate {
+		return errors.New("invalid input: Duplicate item")
+	} else {
+		fmt.Println("Not duplicate")
+	}
 	if err == nil {
 		newItem := menuItem{
 			name:   strings.TrimSpace(newItemName),
@@ -33,14 +41,25 @@ func (m *menu) addItem(inputStream *bufio.Reader) {
 		}
 		*m = append(*m, newItem)
 	} else {
-		fmt.Println("Error accpeting menu item name", err)	
+		fmt.Println("Error accpeting menu item name", err)
+		return err
 	}
+	return nil
+}
+
+func (m *menu) checkDuplicate(newItem string) bool {
+	for _, item := range *m {
+		if item.name == newItem {
+			return true
+		}
+	}
+	return false
 }
 
 func Print() {
 	data.print()
 }
 
-func AddItem(inputStream *bufio.Reader) {
-	data.addItem(inputStream)
+func AddItem(inputStream *bufio.Reader) error {
+	return data.addItem(inputStream)
 }

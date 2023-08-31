@@ -29,7 +29,10 @@ func processOptions(choice string) {
 	case "1":
 		menu.Print()
 	case "2":
-		menu.AddItem(in)
+		err := menu.AddItem(in)
+		if err != nil {
+			fmt.Println(fmt.Errorf("unable to add item: %w", err))
+		}
 	case "q":
 		fmt.Println("Exiting Application")
 	default:
