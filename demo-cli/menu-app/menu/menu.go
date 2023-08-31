@@ -33,7 +33,7 @@ func (m *menu) addItem(inputStream *bufio.Reader) {
 		}
 		*m = append(*m, newItem)
 	} else {
-		fmt.Println("Error accpeting menu item name", err)
+		fmt.Println("Error accpeting menu item name", err)	
 	}
 }
 
