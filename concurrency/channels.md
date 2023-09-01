@@ -30,3 +30,31 @@ Channel operations block until complementary operations are ready. In other word
  - Receiving operation will block at the receiver until the sender is ready.
 
 This blocking behavior is what allows channels to synchronize goroutines and help them communicate with each other.
+
+#### Select statements
+Select statement in Go are similar to switch statements, but are optimized to work with channels instead. They contain cases just like switches and are used to organize results coming back from multiple goroutines from various different channels.
+
+The cases contain channel operations which can be either message send or message receive. Typically the `select` statement is a blocking operation and Go will not continue the execution of the program until one of the cases gets satisfied. To make it unblocking, we can add a `default` case, which is just like switch - executes when none of the other defined cases match.
+
+One stark difference between select statement and switch statements is that in select, if more than one case can be acted upon, then one case is chosen at random. Unlike switch where the case defined first gets preference. 
+
+The following code sample shows how select statement are used in a Go program -
+```go
+// Select statement works for channels
+// Unlike switch, there is no condition or variable to evaluate
+select {
+    // Case for if we received a message from channel 1
+    case msg := <- ch1:
+        fmt.Println(msg)
+    // Case for if we received a message from channel 2
+    case msg := <- ch2:
+        fmt.Println(msg)
+}
+
+// Without a default case, this is a blocking call and Go will not proceed until we receive a message 
+// from either ch1 or ch2.
+// If no goroutines are scheduled to run and the execution flow comes across a select statement which
+// has cases that are waiting on some channels, Go issues a panic due to a deadlock - since with no goroutines 
+// scheduled, there can be no way the program completes naturally. 
+// This can be avoided by adding a default case.
+```

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"sync"
+	"time"
 )
 
 func main() {
@@ -15,6 +16,8 @@ func main() {
 		demonstrateConcurrencyThroughWaitGroups()
 	case "ch":
 		demonstrateConcurrencyWithChannels()
+	case "sel":
+		demonstrateSelectStatements()
 	default:
 		fmt.Println(fmt.Errorf("invalid argument: %s", *demoVariant))
 	}
@@ -60,4 +63,36 @@ func demonstrateConcurrencyWithChannels() {
 	}()
 	// wait till we have received the message from the channel
 	wg.Wait()
+}
+
+func demonstrateSelectStatements() {
+	// create multiple channels
+	ch1, ch2 := make(chan string), make(chan string)
+
+	// create goroutines to communicate on channels
+	go func() {
+		ch1 <- "Message to channel 1"
+	}()
+
+	go func() {
+		ch2 <- "Message to channel 2"
+	}()
+
+	// This is just to give Go scheduler some time to schedule both the routines
+	time.Sleep(10 * time.Millisecond)
+
+	// Since both cases are now valid, a case will be selected at random.
+	select {
+	case msg := <-ch1:
+		fmt.Println(msg)
+	case msg := <-ch2:
+		fmt.Println(msg)
+	default:
+		// Default will PROBABLY not be executed now since the Go scheduler has
+		// had time to schedule and run (10 ms) at least one of the 2 goroutines.
+		// If the sleep statement was not there, there was a HIGH CHANCE that this
+		// case might have ran.
+		// But there is no guarantee for the above.
+		fmt.Println("No messages received")
+	}
 }
