@@ -16,6 +16,8 @@ func main() {
 		demonstrateConcurrencyThroughWaitGroups()
 	case "ch":
 		demonstrateConcurrencyWithChannels()
+	case "chloop":
+		demonstrateChannelLooping()
 	case "sel":
 		demonstrateSelectStatements()
 	default:
@@ -94,5 +96,27 @@ func demonstrateSelectStatements() {
 		// case might have ran.
 		// But there is no guarantee for the above.
 		fmt.Println("No messages received")
+	}
+}
+
+func demonstrateChannelLooping() {
+	// create a channel that processes ints
+	ch := make(chan int)
+
+	go func() {
+		for i := 0; i < 10; i++ {
+			// send i to the channel
+			ch <- i
+		}
+		// If we do not close the channel here and there is a for loop
+		// that is looping over this channel, the loop will keep waiting
+		// for the next message. This leads to a deadlock condition.
+		close(ch)
+	}()
+
+	// The messages from the channel are processed in order in which they
+	// were sent to the channel.
+	for msg := range ch {
+		fmt.Println(msg)
 	}
 }

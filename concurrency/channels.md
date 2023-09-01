@@ -31,6 +31,38 @@ Channel operations block until complementary operations are ready. In other word
 
 This blocking behavior is what allows channels to synchronize goroutines and help them communicate with each other.
 
+#### Looping with Channels
+We can appply the concept of looping to channels to allow sending multiple messages to the same channel. In Go, this can be achieved by using a variation of the for loop.
+One thing to note about using for loops with channels is that channels are a special type of collection - unlike other collections that Go has (slices, arrays, maps, etc.), a channel is not a closed closed collection.
+This means that the size of the channel is unknown and there is always the possibility of having another message when looping over the channel.
+
+So, to indicate that a channel will not have any more messages, we can use the `close(channel)` function. After this function is invoked, no more messages are allowed to be sent to the channel. 
+Invoking this function also signals the for loops in the program that the channel does not have any more messages and this is how the loop gets closed.
+
+The following examples illustrates how for loops can be used to loop through channels receive multiple messages.
+ 
+```go
+// Create channel
+ch := make(chan int)
+
+// goroutine that generates messages into the channel
+go func(){
+    for i := 0; i < 10; i++ {
+        // put integer message into the channel
+        ch <- i
+    }
+    // close the channel - so that no more messages are allowed to be sent
+    // this signals the loops that are looping over this channel that there are no more messages and therefore the loop can be stopped.
+    close(ch)
+}()
+
+// iterate through the channel using for - 
+// each iteration pulls in a single message from the channel
+for msg := range ch {
+    // code to consume messages
+}
+```
+
 #### Select statements
 Select statement in Go are similar to switch statements, but are optimized to work with channels instead. They contain cases just like switches and are used to organize results coming back from multiple goroutines from various different channels.
 
