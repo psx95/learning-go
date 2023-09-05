@@ -31,10 +31,23 @@ Go has built-in support for various kinds of testing for applications.
     ```shell
         # To run tests in the current directory
         go test .
+        # To run tests using fully qualified package ID (this uses module name)
+        go test {modulename}/{directory_name}
 
         # To run all tests in module from the root directory of module
         # This will run all tests in the root directory as well as sub-directories.
-        go test ./...    
+        go test ./...
+
+        # To run test functions that match a particular regex, use the run flag
+        go test ./... run <regex>
+        # Making a concrete example of the above, if we wanted to run a test function
+        # whose name contains the word 'Add', we would issue the following command -
+        go test ./... run Add
+
+        # To skip selected tests from the test suite using the testing API (the t object)
+        # Inside the test function, invoke the skip method - 
+        t.Skip()
+
     ```
 
 #### Ways of reporting test failures in Go
@@ -54,3 +67,16 @@ Methods to indicate this kind of failure -
 1. `t.FailNow()` - corresponds to `t.Fail()`
 2. `t.Fatal(...interface{})` - corresponds to `t.Error(...interface{})`
 3. `t.Fatalf(string, ...interface{})` - corresponds to `t.Errorf(string, ...interface{})`
+
+#### Black box testing vs White box testing
+Black box testing in Go means writing tests using only the public API available. In contrast, when writing white box tests, we have full access to all the code we are testing.
+
+These differences in the tests are merely conceptual knowledge. The Go test runner does not make distinction between the two kinds of tests - it will run both kinds of tests in the exact same manner.
+
+All differences between the two kinds of testing are explained in the table below - 
+| White Box Tests | Block Box Tests |
+| --------------- | --------------- |
+| Test has access to all the code | Test can only interact with the public API |
+| Tests are in the same package as the production code | Tests are in a separate package |
+
+*NOTE: For black box testing, we need the code to be in a separate package, which would typically mean creating another directory. However, Go recognizes this use case of writing black box tests and allows putting the black box test in a separate directory without creating a corresponding folder.*
