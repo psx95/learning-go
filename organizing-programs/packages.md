@@ -6,6 +6,10 @@
 
 *NOTE: As a reminder, a Go module is any directory with `go.mod` file inside it.*
 
+#### Important environment variables in Go
+ - GOROOT: Location where Go is installed on your system. This is used to find Go binaries and libraries.
+ - GOPATH: Location of the Go workspace. This is where all the Go code resides.
+
 #### Using packages in Go
 
 ##### Package declaration
@@ -19,7 +23,8 @@ func foo() {
     // function code
 }
 ```
-This file must be present in a directory called user, otherwise the program will not compile.
+**This file must be present in a directory called user, otherwise the program will not compile.**
+
 As mentioned above, `package main` conveys a special meaning to the compiler, so any source go files using this package, need not be in a directory named `main`. 
 
 
@@ -72,4 +77,41 @@ type User struct {
     Username string     // public field: can be accessed outside the user package
     password string     // private member: reserved for use within the user package
 }
+```
+
+##### Recommended folder structure for GOROOT and GOPATH
+ - GOROOT: should contain the following folders
+  - src: contains source files for the standard library
+  - pkg: contains compiled packages used by Go
+  - bin: contains executable commands
+
+- GOPATH: should contain the following folders
+ - src: all Go source files
+ - pkg: contains third party libraries or binaries
+ - bin: contains all the executables
+
+#### Initializing packages - the init function
+When running a Go program, the Go runtime looks for the main function and executes it directly. However, before the Go runtime executes the main function, it runs the `init()` function automatically.
+
+The `init()` function is responsible for performing initialization tasks such as setting up logging or creating global variables or any other tasks that must be done before the program starts. The Init function has the following propertties - 
+1. Called by Go runtime
+2. Takes no argument
+3. No return value
+4. Runs before the main function
+5. There can be multiple init functions in a Go application - they are run according based on the file names in alphabetical order
+6. Each init function is executed only once per application at the start of the program
+
+```go
+// main.go
+import "fmt"
+func init() {
+    fmt.Println("Hello from init")
+}
+
+func main() {
+    fmt.Println("Hello from main")
+}
+// When this file is run, the following output is expected to be seen:
+// Hello from init
+// Hello from main
 ```
