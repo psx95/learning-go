@@ -53,17 +53,17 @@ Go has built-in support for various kinds of testing for applications.
 #### Ways of reporting test failures in Go
 Go provides multiple ways to report a test failure, but they are broadly divided in two categories - immediate failures and non-immediate failures - 
 
-##### Immediate failures
-This means that the test failed catastrophically and the testing function should not be allowed to continue executing.
-Methods to indicate this kind of failure - 
+##### Non-immediate failures
+This means that the some test conditions failed, but the test is still valid and so other conditions may still be checked - the test function keeps running.
+Methods to indicate this kind of failure -
 1. `t.Fail()` - Simply marks test as failed and moves on
 2. `t.Error(...interface{})` - Same as fail, but allows the user to pass additional information through the variatic interfaces.
 3. `t.Errorf(string, ...interface{{})` - Same as error, but allows the user to pass a formatted string instead of raw input types.
 *Note: Each of these methods have a corresponding method which results in the immediate failure of the test. This is discussed below.*
 
-##### Non-immediate failures
-This means that the some test conditions failed, but the test is still valid and so other conditions may still be checked - the test function keeps running.
-Methods to indicate this kind of failure -
+##### Immediate failures
+This means that the test failed catastrophically and the testing function should not be allowed to continue executing.
+Methods to indicate this kind of failure - 
 1. `t.FailNow()` - corresponds to `t.Fail()`
 2. `t.Fatal(...interface{})` - corresponds to `t.Error(...interface{})`
 3. `t.Fatalf(string, ...interface{})` - corresponds to `t.Errorf(string, ...interface{})`
