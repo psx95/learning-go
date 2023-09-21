@@ -8,7 +8,10 @@ type Order struct {
 	Status      OrderStatus
 }
 
-var Orders []Order
+type InvalidOrder struct {
+	Order      Order
+	InvalidErr error
+}
 
 type OrderStatus int
 
