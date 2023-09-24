@@ -20,6 +20,8 @@ func main() {
 		demonstrateChannelLooping()
 	case "sel":
 		demonstrateSelectStatements()
+	case "buf":
+		demonstrateBufferedChannels()
 	default:
 		fmt.Println(fmt.Errorf("invalid argument: %s", *demoVariant))
 	}
@@ -119,4 +121,20 @@ func demonstrateChannelLooping() {
 	for msg := range ch {
 		fmt.Println(msg)
 	}
+}
+
+func demonstrateBufferedChannels() {
+	// create a buffered channel
+	ch := make(chan int, 1) // buffer capacity 1
+
+	fmt.Println("sending messsage to buffered channel")
+	ch <- 123 // send 123 to channel
+	fmt.Println("execution flow unblocked, receiving from channel")
+
+	// If the buffer was absent, we would have reached a deadlock
+	// condition, since the code on line 130 would have become blocking.
+	// (It would wait for some code to recieve from channel, but due to
+	// the buffer, the message was able to be stored temporarily in a buffer,
+	// unblocking the control flow.)
+	fmt.Println(<-ch) // recieve from channel
 }
