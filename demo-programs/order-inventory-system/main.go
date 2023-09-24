@@ -17,21 +17,21 @@ func main() {
 	go recieveOrders(recieveOrderCh)
 	go validateOrders(recieveOrderCh, validOrderCh, invalidOrderCh)
 	wg.Add(1)
-	// anonymous function to listen to valid order channer
-	go func() {
+	// anonymous function to listen to valid order channel
+	go func(validOrderCh <-chan order.Order) {
 		validOrder := <-validOrderCh
 		fmt.Printf("Valid order received: %v\n", validOrder)
 		wg.Done()
-	}()
-	go func() {
+	}(validOrderCh)
+	go func(invalidOrderCh <-chan order.InvalidOrder) {
 		invalidOrder := <-invalidOrderCh
 		fmt.Printf("invalid order received: %v\n", invalidOrder)
 		wg.Done()
-	}()
+	}(invalidOrderCh)
 	wg.Wait()
 }
 
-func recieveOrders(outChannel chan order.Order) {
+func recieveOrders(outChannel chan<- order.Order) {
 	for _, rawOrder := range rawOrders {
 		var newOrder order.Order
 		err := json.Unmarshal([]byte(rawOrder), &newOrder)
@@ -45,7 +45,7 @@ func recieveOrders(outChannel chan order.Order) {
 	}
 }
 
-func validateOrders(inChannel, outChannel chan order.Order, errorChannel chan order.InvalidOrder) {
+func validateOrders(inChannel <-chan order.Order, outChannel chan<- order.Order, errorChannel chan<- order.InvalidOrder) {
 	incomingOrder := <-inChannel
 	if incomingOrder.Quantity <= 0 {
 		invalidOrder := order.InvalidOrder{
