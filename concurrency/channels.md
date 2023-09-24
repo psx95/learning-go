@@ -134,3 +134,28 @@ var ch_b = make(chan string, 1) // the second parameter is the buffer capacity f
 // the gorouting receives the messages from the buffer and completes.
 // This decouples the sending side of the channel from the recieving side of the channel.
 ```
+#### Directional and undirectional channels
+
+So far, the code samples and discussion above has to do with undirectional channels. Undirectional channels allow us to send, as well as receive messages from the same channel.
+
+The undirectional nature of channels can sometimes lead to code that is unclear or hard to read which can often increase the chances of introducing bugs in the program since the channels maybe used incorrectly. To prevent such situations, Go allow us to use directional channels.
+
+Directional channels work only one-way - by making a channel a directional channel, we force it to either be a send-only channel or be a receive-only cahnnel. This leads to more readable code as the intent of the channel is clear.
+Additionaly, receiving on a send-only channel or sending to a receive-only channel leads to a compile-time error.
+
+The following code snippet shows how to create directional channels: 
+
+```go
+func main() {
+    ch := make(chan string) // bidirectional channel
+
+    go func(ch chan<- string) { // send only channel
+        ch <- "message"
+    }(ch) // bidirectional channel passed here, but works as send-only within the goroutine
+
+    go func(ch <-chan string) { // receive only channel
+        msg := <-ch
+        fmt.Println(msg)
+    }(ch) // bidirectional channel passed here, but works as receive-only within the goroutine
+}
+```
