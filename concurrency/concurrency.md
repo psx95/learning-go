@@ -52,6 +52,48 @@ func main() {
 }
 ```
 
+##### More details on Goroutines:
+
+Goroutines represent the concurrent tasks tha we as programmers create and they 'sit' between the go program which is the code we write and the Go scheduler. In other words, this means that goroutines interact between our program and the scheduler.
+
+The Go scheduler in-turn interacts with the underlying OS using constructs called threads - regardless of the OS being used. 
+Threads are tools which the operating systems use to manage their concurrency.
+
+Goroutines can be considered as virtual threads which are maintained purely within the Go program. 
+Because Goroutines are maintained purely within the Go program, they are limited and cannot do much on their own.
+The Go scheduler maps these goroutines onto actual OS threads which is where the concurrent tasks represented by goroutines is actually executed. In other words, if a goroutine is not scheduled onto an OS thread, it will not be able to do anything.
+
+*NOTE: Many languages do not have this virtualization concept and so to perform concurrent tasks in those languages, one would need to create an OS thread directly and perform work on that thread.*
+
+A comparison between a goroutine and a thread can be summarized in the table below :
+| thread  | goroutine |
+| -------| ------ |
+| Have their own execution stack | Have their own execution stack |
+| Fixed stack space (~1MB) | Variable stack space (~starts at 2KB, max upto ~ 2GB) |
+| Managed by OS (slightly more efficient, since no scheduler overhead) | Managed by Go runtime |
+| Relatively expensive (interactions between OS and the program) | Inexpensive since its managed by runtime, need only talk to the go runtime |
+
+##### Lifecycle of a goroutine
+
+Broadly speaking, there are 3 main stages in the lifecycle of a goroutine - 
+1. Create
+2. Execute
+3. Exit
+
+However, since goroutines are scheduled for execution by the scheduler, this means whenever a goroutine is not scheduled to run on a thread by the scheduler - it is in a *blocking* state. This simply means the goroutine while created, is not doing anything.
+Whenever the goroutine is scheduled to run on a thread by the scheduler, go routine moves to a *running* state. In the execution phase, the goroutine may switch between these two states, depending on the kind of work it is doing. 
+
+For instance, if a goroutine is waiting on some input from the user, the scheduler may unschedule it from an OS thread - causing the goroutine to move to a *blocking* state, once it recieves the input, the scheduler would move the goroutine back to the *running* state.
+
+Some other examples of why a goroutine might move to a blocking state include: 
+ - The goroutine maybe waiting on a system call. Eg - the goroutine might be creating a file, which is a system call, in this case the goroutine will have to wait till the system call is complete. 
+ - The goroutine might simply be sleeping. Eg - the `time.sleep` function tells the goroutine to wait for a certain period of time before continuing the execution.
+ - Waiting on a network call - the goroutine could make a network call and may have to wait for receiving a response before continuing. In this case there is no value for the goroutine to be scheduled onto a thread simply waiting for the response.
+
+In each of the above cases, the scheduler will not schedule the goroutine to run on an OS thread - since there is no active work to be done. This also means that the go scheduler may pull off already scheduled/executing goroutines from the OS threads if there is no active work to be performed. The scheduler reschedules these goroutines once they are out of the blocking state by scheduling them onto OS threads.
+
+
+**NOTE:** Goroutines also have the responsibility of executing deferred functions. If a goroutine has a deferred function that it initiates, then the goroutine becomes the execution context of the deferred function and it will execute the deferred function after completing its execution.
 
 #### WaitGroups
 WaitGroups are essentially counters which exhibit special behavior when their value reaches 0. Since it is a counter, we can - 
