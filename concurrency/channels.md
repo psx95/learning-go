@@ -90,3 +90,47 @@ select {
 // scheduled, there can be no way the program completes naturally. 
 // This can be avoided by adding a default case.
 ```
+#### Buffered and unbuffered channels
+
+##### Unbuffered channels
+So far, the channels shown in the above code snippets are examples of unbuffered channels. Unbuffered channels do not have a buffer capacity to hold the messages. In other words, when sending a message in an unbuffered channel, the go scheduler will block the execution of the go code untill there is a reciever to consume the message from the channel.
+
+The code listening for messages on the channel is blocked as well till there is a message available in the channel and as soon as there is a message available, the flow on both - the sender and the receiver side is unblocked.
+
+##### Buffered channels
+Buffered channels have an internal buffer which is capable of holding a certain number of messages untill they are ready to be consumed by another receiver channel. This internal buffer prevents blocking the execution flow of the program since the channel itself acts like a receiver which immediately consumes the message. 
+
+For instance, if a channel has a buffer size of 1 - this means that the channel is capable of holding 1 message in its internal buffer. This means, if a message is sent onto this channel, that message can be held in its internal buffer which can later be consumed by an external receiver. However, since the message is temporarily held in a buffer, the execution flow does not block and is therefore allowed to continue execution. 
+
+```go
+// unbuffered channel 
+var ch = make(chan string)
+
+func send() {
+    // send message
+    ch  <- "message" // the control flow is blocked on this line till a reciever consumes message
+}
+
+func receive() {
+    // consume message from channel
+    msg := <-ch // the control flow is blocked on this line till a sender sends a message
+    fmt.Println(msg)
+}
+
+func main() {
+    // syncronization code
+    // ...
+    go send()
+    go receive()
+}
+
+// buffered channels
+var ch_b = make(chan string, 1) // the second parameter is the buffer capacity for messages
+
+// If ch_b is used in the send function, the send() function will not block till the reciever is ready,
+// instead, the send function immmediately exists since the channel can hold 1 message internally in its 
+// internal buffer.
+// On the receiver side, things work similarly, since there is already a message on the internal buffer, 
+// the gorouting receives the messages from the buffer and completes.
+// This decouples the sending side of the channel from the recieving side of the channel.
+```
