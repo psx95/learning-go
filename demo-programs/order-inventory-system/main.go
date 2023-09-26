@@ -17,18 +17,19 @@ func main() {
 	go recieveOrders(recieveOrderCh)
 	go validateOrders(recieveOrderCh, validOrderCh, invalidOrderCh)
 	wg.Add(1)
-	// anonymous function to listen to valid order channel
-	go func(validOrderCh <-chan order.Order) {
-		validOrder := <-validOrderCh
-		fmt.Printf("Valid order received: %v\n", validOrder)
-		wg.Done()
-	}(validOrderCh)
-	go func(invalidOrderCh <-chan order.InvalidOrder) {
-		invalidOrder := <-invalidOrderCh
-		fmt.Printf("invalid order received: %v\n", invalidOrder)
-		wg.Done()
-	}(invalidOrderCh)
-	wg.Wait()
+
+	go func(validOrderCh <-chan order.Order, invalidOrderCh <-chan order.InvalidOrder) {
+		// select is blocking, we typically do not want to block main thread,
+		// so move this select in a goroutine.
+		select {
+		case validOrder := <-validOrderCh:
+			fmt.Printf("Valid order received: %v\n", validOrder)
+		case invalidOrder := <-invalidOrderCh:
+			fmt.Printf("invalid order received: %v\n", invalidOrder)
+		}
+		wg.Done() // will be executed only after one of the above cases is executed
+	}(validOrderCh, invalidOrderCh)
+	wg.Wait() // wait till the order is sent either to valid order or invalid oder channel
 }
 
 func recieveOrders(outChannel chan<- order.Order) {
