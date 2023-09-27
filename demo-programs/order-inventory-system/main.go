@@ -19,17 +19,35 @@ func main() {
 	wg.Add(1)
 
 	go func(validOrderCh <-chan order.Order, invalidOrderCh <-chan order.InvalidOrder) {
-		// select is blocking, we typically do not want to block main thread,
-		// so move this select in a goroutine.
-		select {
-		case validOrder := <-validOrderCh:
-			fmt.Printf("Valid order received: %v\n", validOrder)
-		case invalidOrder := <-invalidOrderCh:
-			fmt.Printf("invalid order received: %v\n", invalidOrder)
+	loop:
+		// Keep running select until all orders are routed to the correct channels
+		for {
+			// select is blocking, we typically do not want to block main thread,
+			// so move this select in a goroutine.
+			select {
+			case validOrder, ok := <-validOrderCh:
+				if ok {
+					fmt.Printf("Valid order received: %v\n", validOrder)
+				} else {
+					// this will break out of the outer-for loop
+					// without the label, the break would have broken out of
+					// inner select statement
+					break loop
+				}
+			case invalidOrder, ok := <-invalidOrderCh:
+				if ok {
+					fmt.Printf("invalid order received: %v\n", invalidOrder)
+				} else {
+					// this will break out of the outer-for loop
+					// without the label, the break would have broken out of
+					// inner select statement
+					break loop
+				}
+			}
 		}
-		wg.Done() // will be executed only after one of the above cases is executed
+		wg.Done()
 	}(validOrderCh, invalidOrderCh)
-	wg.Wait() // wait till the order is sent either to valid order or invalid oder channel
+	wg.Wait() // wait till all orders are processed
 }
 
 func recieveOrders(outChannel chan<- order.Order) {
@@ -40,23 +58,30 @@ func recieveOrders(outChannel chan<- order.Order) {
 			log.Println(err)
 			continue
 		}
-		fmt.Println("sending order to receieve order channel")
+		fmt.Println("sending order to receive order channel")
 		// send order to outChannel for validation
 		outChannel <- newOrder
 	}
+	// close the outgoing channel - since all orders are received
+	close(outChannel)
 }
 
 func validateOrders(inChannel <-chan order.Order, outChannel chan<- order.Order, errorChannel chan<- order.InvalidOrder) {
-	incomingOrder := <-inChannel
-	if incomingOrder.Quantity <= 0 {
-		invalidOrder := order.InvalidOrder{
-			Order:      incomingOrder,
-			InvalidErr: fmt.Errorf("invalid order quantity: %v, order quantity should be greater than 0", incomingOrder.Quantity),
+	for incomingOrder := range inChannel {
+		if incomingOrder.Quantity <= 0 {
+			invalidOrder := order.InvalidOrder{
+				Order:      incomingOrder,
+				InvalidErr: fmt.Errorf("invalid order quantity: %v, order quantity should be greater than 0", incomingOrder.Quantity),
+			}
+			errorChannel <- invalidOrder
+		} else {
+			outChannel <- incomingOrder
 		}
-		errorChannel <- invalidOrder
-	} else {
-		outChannel <- incomingOrder
-	}
+	} // will exit loop when inChannel is closed
+	// once input channel is closed, close the outChannel and the errorChannel
+	// since no more incoming orders to validate.
+	close(outChannel)
+	close(errorChannel)
 }
 
 var rawOrders = []string{
