@@ -58,9 +58,41 @@ go func(){
 
 // iterate through the channel using for - 
 // each iteration pulls in a single message from the channel
+// notice that unlike normal for loops in go, when looping over a channel,
+// we do not get an index variable
 for msg := range ch {
     // code to consume messages
 }
+
+// another example
+func loopChannel() {
+    ch := make(chan string, 3) // buffered channel
+
+    // in production code, we never want to use channels with syncronous code
+
+    for _, v := range[...]arr{"foo", "bar", "baz"} {
+        // ch can hold up to 3 values since the buffer size is 3
+        ch <- v // send values to channel
+    }
+    // close channel so that no more messages can be sent
+    // note that the channel's buffer will still hold messages
+    // sent to the channel so far.
+    close(ch) 
+
+    // iterate through the channel to consume messages
+    for msg := range ch {
+        fmt.Println(msg)
+    }
+}
+// The output of loopChannel() would be - 
+// foo
+// bar
+// baz
+//
+// NOTE: In case the channel was not closed in the loopChannel() function, then the program would have
+// entered a state of deadlock and crashed. This is because, 'ch' is an open collection. In other words,
+// nothing is signaling the channel 'ch' that there are no more mesasges and so it keeps on waiting
+// to receive new messages - causing a deadlock.
 ```
 
 #### Select statements
