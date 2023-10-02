@@ -97,3 +97,13 @@ func worker(inCh <-chan string) (outCh chan<- int, errCh<- error) {
     return outCh, errCh
 }
 ```
+
+#### Foundational concurrency patterns
+There are four foundational concurrency patterns commonly found in Go and most other languages - 
+1. Single producer, single consumer
+2. Single producer, multiple consumers
+3. Multiple producers, single consumer
+4. Multiple producers, multiple consumers
+
+ - **Producer(s)** is/are the goroutine(s) that is/are producing the message(s) in a channel.
+ - **Consumer(s)** is/are the goroutine(s) that is/are recieving the message(s) from a channel.
