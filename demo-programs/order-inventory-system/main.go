@@ -9,13 +9,9 @@ import (
 )
 
 func main() {
-	recieveOrderCh := make(chan order.Order)
-	validOrderCh := make(chan order.Order)
-	invalidOrderCh := make(chan order.InvalidOrder)
-
 	var wg sync.WaitGroup
-	go recieveOrders(recieveOrderCh)
-	go validateOrders(recieveOrderCh, validOrderCh, invalidOrderCh)
+	recieveOrderCh := recieveOrders()
+	validOrderCh, invalidOrderCh := validateOrders(recieveOrderCh)
 	wg.Add(1)
 
 	go func(validOrderCh <-chan order.Order, invalidOrderCh <-chan order.InvalidOrder) {
@@ -50,38 +46,50 @@ func main() {
 	wg.Wait() // wait till all orders are processed
 }
 
-func recieveOrders(outChannel chan<- order.Order) {
-	for _, rawOrder := range rawOrders {
-		var newOrder order.Order
-		err := json.Unmarshal([]byte(rawOrder), &newOrder)
-		if err != nil {
-			log.Println(err)
-			continue
+func recieveOrders() <-chan order.Order {
+	// outChannel could be passed as a parameter, but then
+	// it would be necessary to guard against a nil channel
+	// since it would lead to a panic.
+	outChannel := make(chan order.Order)
+	go func() {
+		for _, rawOrder := range rawOrders {
+			var newOrder order.Order
+			err := json.Unmarshal([]byte(rawOrder), &newOrder)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			fmt.Println("sending order to receive order channel")
+			// send order to outChannel for validation
+			outChannel <- newOrder
 		}
-		fmt.Println("sending order to receive order channel")
-		// send order to outChannel for validation
-		outChannel <- newOrder
-	}
-	// close the outgoing channel - since all orders are received
-	close(outChannel)
+		// close the outgoing channel - since all orders are received
+		close(outChannel)
+	}()
+	return outChannel
 }
 
-func validateOrders(inChannel <-chan order.Order, outChannel chan<- order.Order, errorChannel chan<- order.InvalidOrder) {
-	for incomingOrder := range inChannel {
-		if incomingOrder.Quantity <= 0 {
-			invalidOrder := order.InvalidOrder{
-				Order:      incomingOrder,
-				InvalidErr: fmt.Errorf("invalid order quantity: %v, order quantity should be greater than 0", incomingOrder.Quantity),
+func validateOrders(inChannel <-chan order.Order) (<-chan order.Order, <-chan order.InvalidOrder) {
+	outChannel := make(chan order.Order)
+	errorChannel := make(chan order.InvalidOrder)
+	go func() {
+		for incomingOrder := range inChannel {
+			if incomingOrder.Quantity <= 0 {
+				invalidOrder := order.InvalidOrder{
+					Order:      incomingOrder,
+					InvalidErr: fmt.Errorf("invalid order quantity: %v, order quantity should be greater than 0", incomingOrder.Quantity),
+				}
+				errorChannel <- invalidOrder
+			} else {
+				outChannel <- incomingOrder
 			}
-			errorChannel <- invalidOrder
-		} else {
-			outChannel <- incomingOrder
-		}
-	} // will exit loop when inChannel is closed
-	// once input channel is closed, close the outChannel and the errorChannel
-	// since no more incoming orders to validate.
-	close(outChannel)
-	close(errorChannel)
+		} // will exit loop when inChannel is closed
+		// once input channel is closed, close the outChannel and the errorChannel
+		// since no more incoming orders to validate.
+		close(outChannel)
+		close(errorChannel)
+	}()
+	return outChannel, errorChannel
 }
 
 var rawOrders = []string{
