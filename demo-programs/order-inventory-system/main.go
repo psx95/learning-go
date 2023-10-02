@@ -9,79 +9,137 @@ import (
 )
 
 func main() {
-	recieveOrderCh := make(chan order.Order)
-	validOrderCh := make(chan order.Order)
-	invalidOrderCh := make(chan order.InvalidOrder)
-
 	var wg sync.WaitGroup
-	go recieveOrders(recieveOrderCh)
-	go validateOrders(recieveOrderCh, validOrderCh, invalidOrderCh)
-	wg.Add(1)
+	recieveOrderCh := recieveOrders()
+	validOrderCh, invalidOrderCh := validateOrders(recieveOrderCh)
+	reservedInventoryCh := reserveInventory(validOrderCh)
+	fillOrdersCh := fillOrders(reservedInventoryCh)
 
-	go func(validOrderCh <-chan order.Order, invalidOrderCh <-chan order.InvalidOrder) {
-	loop:
-		// Keep running select until all orders are routed to the correct channels
-		for {
-			// select is blocking, we typically do not want to block main thread,
-			// so move this select in a goroutine.
-			select {
-			case validOrder, ok := <-validOrderCh:
-				if ok {
-					fmt.Printf("Valid order received: %v\n", validOrder)
-				} else {
-					// this will break out of the outer-for loop
-					// without the label, the break would have broken out of
-					// inner select statement
-					break loop
-				}
-			case invalidOrder, ok := <-invalidOrderCh:
-				if ok {
-					fmt.Printf("invalid order received: %v\n", invalidOrder)
-				} else {
-					// this will break out of the outer-for loop
-					// without the label, the break would have broken out of
-					// inner select statement
-					break loop
-				}
-			}
+	// Add 2 to the counter, one for invalid orders, the other for filling orders
+	wg.Add(2)
+
+	// consume all the invalid orders
+	go func(invlidOrderCh <-chan order.InvalidOrder) {
+		for invalidOrder := range invalidOrderCh {
+			fmt.Printf("invalid order received: %v\n", invalidOrder)
 		}
 		wg.Done()
-	}(validOrderCh, invalidOrderCh)
+	}(invalidOrderCh)
+
+	go func(fillOrdersCh <-chan order.Order) {
+		for filledOrder := range fillOrdersCh {
+			fmt.Printf("Order Completed: %v\n", filledOrder)
+		}
+		wg.Done()
+	}(fillOrdersCh)
+
 	wg.Wait() // wait till all orders are processed
 }
 
-func recieveOrders(outChannel chan<- order.Order) {
-	for _, rawOrder := range rawOrders {
-		var newOrder order.Order
-		err := json.Unmarshal([]byte(rawOrder), &newOrder)
-		if err != nil {
-			log.Println(err)
-			continue
+func recieveOrders() <-chan order.Order {
+	// outChannel could be passed as a parameter, but then
+	// it would be necessary to guard against a nil channel
+	// since it would lead to a panic.
+	outChannel := make(chan order.Order)
+	go func() {
+		for _, rawOrder := range rawOrders {
+			var newOrder order.Order
+			err := json.Unmarshal([]byte(rawOrder), &newOrder)
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			// send order to outChannel for validation
+			outChannel <- newOrder
 		}
-		fmt.Println("sending order to receive order channel")
-		// send order to outChannel for validation
-		outChannel <- newOrder
-	}
-	// close the outgoing channel - since all orders are received
-	close(outChannel)
+		// close the outgoing channel - since all orders are received
+		close(outChannel)
+	}()
+	return outChannel
 }
 
-func validateOrders(inChannel <-chan order.Order, outChannel chan<- order.Order, errorChannel chan<- order.InvalidOrder) {
-	for incomingOrder := range inChannel {
-		if incomingOrder.Quantity <= 0 {
-			invalidOrder := order.InvalidOrder{
-				Order:      incomingOrder,
-				InvalidErr: fmt.Errorf("invalid order quantity: %v, order quantity should be greater than 0", incomingOrder.Quantity),
+// fillOrder completes all the reserved orders from the reserve inventory channel.
+func fillOrders(in <-chan order.Order) <-chan order.Order {
+	out := make(chan order.Order)
+	var wg sync.WaitGroup
+
+	const workers = 3
+	wg.Add(workers)
+
+	// multiple consumers of the same channel
+	for i := 0; i < workers; i++ {
+		go func(worker int) {
+			for o := range in {
+				fmt.Printf("order: %v, worker: %v\n", o.ProductCode, worker)
+				o.Status = order.Filled
+				out <- o
 			}
-			errorChannel <- invalidOrder
-		} else {
-			outChannel <- incomingOrder
-		}
-	} // will exit loop when inChannel is closed
-	// once input channel is closed, close the outChannel and the errorChannel
-	// since no more incoming orders to validate.
-	close(outChannel)
-	close(errorChannel)
+			wg.Done()
+		}(i)
+	}
+
+	go func() {
+		wg.Wait()
+		close(out)
+	}()
+
+	return out
+}
+
+// reserveInventory updates status of all valid orders received by the application to reserved.
+func reserveInventory(in <-chan order.Order) <-chan order.Order {
+	out := make(chan order.Order)
+	var wg sync.WaitGroup
+
+	// add multiple producers for reserved inventory channel
+	// multiple producers means spawning multiple workers to simultaneously push messages to the
+	// reserved inventory channel
+	const workers = 3
+	// wait group that waits on all workers
+	wg.Add(workers)
+	// create multiple goroutines - each of them send messages to the same channel
+	for i := 0; i < workers; i++ {
+		go func() {
+			// go through all valid orders received and store them in the inventory
+			for o := range in {
+				o.Status = order.Reserved
+				out <- o // send updated orders to a channel
+			}
+			wg.Done()
+		}()
+	}
+
+	// Another goroutine that closes the out channel at the appropriate time
+	// The code in this goroutin could be executed syncronously as well, but that would block the main thread.
+	go func() {
+		wg.Wait() // wait till all workers in the wait group are completed
+		// since all workers sending messages to the channel are finished, close the channel
+		close(out)
+	}()
+	return out
+}
+
+func validateOrders(inChannel <-chan order.Order) (<-chan order.Order, <-chan order.InvalidOrder) {
+	outChannel := make(chan order.Order)
+	errorChannel := make(chan order.InvalidOrder)
+	go func() {
+		for incomingOrder := range inChannel {
+			if incomingOrder.Quantity <= 0 {
+				invalidOrder := order.InvalidOrder{
+					Order:      incomingOrder,
+					InvalidErr: fmt.Errorf("invalid order quantity: %v, order quantity should be greater than 0", incomingOrder.Quantity),
+				}
+				errorChannel <- invalidOrder
+			} else {
+				outChannel <- incomingOrder
+			}
+		} // will exit loop when inChannel is closed
+		// once input channel is closed, close the outChannel and the errorChannel
+		// since no more incoming orders to validate.
+		close(outChannel)
+		close(errorChannel)
+	}()
+	return outChannel, errorChannel
 }
 
 var rawOrders = []string{

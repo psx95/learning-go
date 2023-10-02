@@ -24,12 +24,16 @@ ch <- "hello"
 msg := <- ch
 ```
 
-**NOTE**
+**NOTE 1**
 Channel operations block until complementary operations are ready. In other words, 
  - Sending operation will block at the sender until the receiver is ready.
  - Receiving operation will block at the receiver until the sender is ready.
 
 This blocking behavior is what allows channels to synchronize goroutines and help them communicate with each other.
+
+**NOTE 2**
+Channels in Go can have nil values, an uninintialised channel variable has the value `nil`. 
+If a message is sent to a nil channel, the Go application panics.
 
 #### Looping with Channels
 We can appply the concept of looping to channels to allow sending multiple messages to the same channel. In Go, this can be achieved by using a variation of the for loop.

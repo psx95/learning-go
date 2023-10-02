@@ -19,22 +19,26 @@ func (o Order) String() string {
 	return fmt.Sprintf("Product Code: %v, Quantity: %v, Status: %v\n", o.ProductCode, o.Quantity, orderStatusToString(o.Status))
 }
 
+func (io InvalidOrder) String() string {
+	return fmt.Sprintf("Product Code: %v, Quantity: %v, Status: %v, Issue: %v\n", io.Order.ProductCode, io.Order.Quantity, orderStatusToString(io.Order.Status), io.InvalidErr.Error())
+}
+
 const (
-	none OrderStatus = iota
-	received
-	reserved
-	filled
+	None OrderStatus = iota
+	Received
+	Reserved
+	Filled
 )
 
 func orderStatusToString(status OrderStatus) string {
 	switch status {
-	case none:
+	case None:
 		return "None"
-	case received:
+	case Received:
 		return "Received"
-	case reserved:
+	case Reserved:
 		return "Reserved"
-	case filled:
+	case Filled:
 		return "Filled"
 	default:
 		return "Unknown status"
