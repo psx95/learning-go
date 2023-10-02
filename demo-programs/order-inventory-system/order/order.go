@@ -20,7 +20,7 @@ func (o Order) String() string {
 }
 
 func (io InvalidOrder) String() string {
-	return fmt.Sprintf("Product Code: %v, Quantity: %v, Status: %v\n", io.Order.ProductCode, io.Order.Quantity, orderStatusToString(io.Order.Status))
+	return fmt.Sprintf("Product Code: %v, Quantity: %v, Status: %v, Issue: %v\n", io.Order.ProductCode, io.Order.Quantity, orderStatusToString(io.Order.Status), io.InvalidErr.Error())
 }
 
 const (
