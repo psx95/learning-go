@@ -61,12 +61,25 @@ func recieveOrders() <-chan order.Order {
 // fillOrder completes all the reserved orders from the reserve inventory channel.
 func fillOrders(in <-chan order.Order) <-chan order.Order {
 	out := make(chan order.Order)
+	var wg sync.WaitGroup
+
+	const workers = 3
+	wg.Add(workers)
+
+	// multiple consumers of the same channel
+	for i := 0; i < workers; i++ {
+		go func(worker int) {
+			for o := range in {
+				fmt.Printf("order: %v, worker: %v\n", o.ProductCode, worker)
+				o.Status = order.Filled
+				out <- o
+			}
+			wg.Done()
+		}(i)
+	}
 
 	go func() {
-		for o := range in {
-			o.Status = order.Filled
-			out <- o
-		}
+		wg.Wait()
 		close(out)
 	}()
 
