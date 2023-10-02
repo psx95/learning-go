@@ -12,37 +12,26 @@ func main() {
 	var wg sync.WaitGroup
 	recieveOrderCh := recieveOrders()
 	validOrderCh, invalidOrderCh := validateOrders(recieveOrderCh)
-	wg.Add(1)
+	reservedInventoryCh := reserveInventory(validOrderCh)
 
-	go func(validOrderCh <-chan order.Order, invalidOrderCh <-chan order.InvalidOrder) {
-	loop:
-		// Keep running select until all orders are routed to the correct channels
-		for {
-			// select is blocking, we typically do not want to block main thread,
-			// so move this select in a goroutine.
-			select {
-			case validOrder, ok := <-validOrderCh:
-				if ok {
-					fmt.Printf("Valid order received: %v\n", validOrder)
-				} else {
-					// this will break out of the outer-for loop
-					// without the label, the break would have broken out of
-					// inner select statement
-					break loop
-				}
-			case invalidOrder, ok := <-invalidOrderCh:
-				if ok {
-					fmt.Printf("invalid order received: %v\n", invalidOrder)
-				} else {
-					// this will break out of the outer-for loop
-					// without the label, the break would have broken out of
-					// inner select statement
-					break loop
-				}
-			}
+	// Add 2 to the counter, one for invalid orders, the other for inventory orders
+	wg.Add(2)
+
+	// consume all the invalid orders
+	go func(invlidOrderCh <-chan order.InvalidOrder) {
+		for invalidOrder := range invalidOrderCh {
+			fmt.Printf("invalid order received: %v\n", invalidOrder)
 		}
 		wg.Done()
-	}(validOrderCh, invalidOrderCh)
+	}(invalidOrderCh)
+
+	go func(reservedInventoryCh <-chan order.Order) {
+		for reservedOrder := range reservedInventoryCh {
+			fmt.Printf("Reserved Order: %v\n", reservedOrder)
+		}
+		wg.Done()
+	}(reservedInventoryCh)
+
 	wg.Wait() // wait till all orders are processed
 }
 
@@ -59,7 +48,6 @@ func recieveOrders() <-chan order.Order {
 				log.Println(err)
 				continue
 			}
-			fmt.Println("sending order to receive order channel")
 			// send order to outChannel for validation
 			outChannel <- newOrder
 		}
@@ -67,6 +55,20 @@ func recieveOrders() <-chan order.Order {
 		close(outChannel)
 	}()
 	return outChannel
+}
+
+// reserveInventory updates status of all valid orders received by the application to reserved.
+func reserveInventory(in <-chan order.Order) <-chan order.Order {
+	out := make(chan order.Order)
+	go func() {
+		// go through all valid orders received and store them in the inventory
+		for o := range in {
+			o.Status = order.Reserved
+			out <- o // send updated orders to a channel
+		}
+		close(out)
+	}()
+	return out
 }
 
 func validateOrders(inChannel <-chan order.Order) (<-chan order.Order, <-chan order.InvalidOrder) {
