@@ -13,8 +13,9 @@ func main() {
 	recieveOrderCh := recieveOrders()
 	validOrderCh, invalidOrderCh := validateOrders(recieveOrderCh)
 	reservedInventoryCh := reserveInventory(validOrderCh)
+	fillOrdersCh := fillOrders(reservedInventoryCh)
 
-	// Add 2 to the counter, one for invalid orders, the other for inventory orders
+	// Add 2 to the counter, one for invalid orders, the other for filling orders
 	wg.Add(2)
 
 	// consume all the invalid orders
@@ -25,12 +26,12 @@ func main() {
 		wg.Done()
 	}(invalidOrderCh)
 
-	go func(reservedInventoryCh <-chan order.Order) {
-		for reservedOrder := range reservedInventoryCh {
-			fmt.Printf("Reserved Order: %v\n", reservedOrder)
+	go func(fillOrdersCh <-chan order.Order) {
+		for filledOrder := range fillOrdersCh {
+			fmt.Printf("Order Completed: %v\n", filledOrder)
 		}
 		wg.Done()
-	}(reservedInventoryCh)
+	}(fillOrdersCh)
 
 	wg.Wait() // wait till all orders are processed
 }
@@ -57,15 +58,49 @@ func recieveOrders() <-chan order.Order {
 	return outChannel
 }
 
+// fillOrder completes all the reserved orders from the reserve inventory channel.
+func fillOrders(in <-chan order.Order) <-chan order.Order {
+	out := make(chan order.Order)
+
+	go func() {
+		for o := range in {
+			o.Status = order.Filled
+			out <- o
+		}
+		close(out)
+	}()
+
+	return out
+}
+
 // reserveInventory updates status of all valid orders received by the application to reserved.
 func reserveInventory(in <-chan order.Order) <-chan order.Order {
 	out := make(chan order.Order)
+	var wg sync.WaitGroup
+
+	// add multiple producers for reserved inventory channel
+	// multiple producers means spawning multiple workers to simultaneously push messages to the
+	// reserved inventory channel
+	const workers = 3
+	// wait group that waits on all workers
+	wg.Add(workers)
+	// create multiple goroutines - each of them send messages to the same channel
+	for i := 0; i < workers; i++ {
+		go func() {
+			// go through all valid orders received and store them in the inventory
+			for o := range in {
+				o.Status = order.Reserved
+				out <- o // send updated orders to a channel
+			}
+			wg.Done()
+		}()
+	}
+
+	// Another goroutine that closes the out channel at the appropriate time
+	// The code in this goroutin could be executed syncronously as well, but that would block the main thread.
 	go func() {
-		// go through all valid orders received and store them in the inventory
-		for o := range in {
-			o.Status = order.Reserved
-			out <- o // send updated orders to a channel
-		}
+		wg.Wait() // wait till all workers in the wait group are completed
+		// since all workers sending messages to the channel are finished, close the channel
 		close(out)
 	}()
 	return out
