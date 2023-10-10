@@ -34,3 +34,38 @@ Since both goroutines in the above code attempt to acquire locks on the same res
 Assuming `goroutine #1` acquires lock first, `goroutine #2` will have to wait till `goroutine #1` releases the lock. Once it does release the acquired lock, `goroutine #2` then acquires it and is allowed to continue it's execution. 
 
 >*NOTE: Mutexes are very good in protecting shared memory, but there is a performance penalty associated with their use, so in general shared memory should be avoided, but sometimes shared memory makes most sense for certain situations, in which case mutex can come in handy.*
+
+#### Once
+Once object in the sync package is used to ensure that something happens only one time.
+
+This is commonly used in initialization logic in programs either because it can cause some unpredictable behavior or it would be inefficient to initialize multiple times.
+
+```go
+// Go program to open connection to a SQLite Database
+
+func main() {
+    foo()
+    foo()
+    // Once object guarantees that the function wrapped inside it is executed only once.
+}
+
+var db *sql.DB
+var o sync.Once
+
+// We would ideally want foo to be run only once, regardless of how many times
+// it is invoked.
+func foo() {
+    // Once only has a single method on it named Do
+    o.Do(func() {
+        log.Println("opening connection to Database")
+        var err error
+        db, err = sql.Open("sqlite3", "./mydb.db") // driver name and connection string
+        if err != nil {
+            log.Fatal(err)
+        }
+    }) // this will run only once.
+    // ...
+    // ...
+    // other code inside foo will still be run as many times as foo is invoked.
+}
+```
