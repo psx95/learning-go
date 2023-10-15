@@ -22,4 +22,5 @@ When using contexts in Go, there are the following conventions around its use -
 3. In a context aware program, contexts must always be passed as arguments to the goroutines.
 
 #### Using contexts in Go
-To see samples of how contexts are used in code checkout [context with cancel](../demo-programs/contexts/contextWithCancel.go) code sameple.
+To see samples of how contexts are used in code checkout -
+1. [context with cancel](../demo-programs/context-cancel-example/main.go) sameple.
