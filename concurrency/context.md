@@ -23,4 +23,5 @@ When using contexts in Go, there are the following conventions around its use -
 
 #### Using contexts in Go
 To see samples of how contexts are used in code checkout -
-1. [context with cancel](../demo-programs/context-cancel-example/main.go) sameple.
+1. [context with cancel](../demo-programs/context-cancel-example/main.go) sameple
+2. [context with timeout](../demo-programs/context-timeout-example/main.go) sample
