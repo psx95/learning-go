@@ -1,6 +1,6 @@
 ### Packages in Go
- 1. Packages provide a higher level mechansim for organize the Go applications or Go modules. 
- 2. Package is simply a directory within a module - since it can be the root directory, the module can itself serve as a packge. 
+ 1. Packages provide a higher level mechanism for organize the Go applications or Go modules. 
+ 2. Package is simply a directory within a module - since it can be the root directory, the module can itself serve as a package. 
  3. Packages in Go must contain at least one go source file.
  4. All source files within a package can share data with each other. In other words, all members within a package are visible to each other.
 
@@ -13,7 +13,7 @@
 #### Using packages in Go
 
 ##### Package declaration
-The very first line in all go source files declare the package. `package main` conveys a special meaning to the Go compiler, but all the other packge names need to be within a folder with the same name. The name of the folder and the package name declaration must match - this is used by the Go compiler to determine where to look for the go source files.
+The very first line in all go source files declare the package. `package main` conveys a special meaning to the Go compiler, but all the other package names need to be within a folder with the same name. The name of the folder and the package name declaration must match - this is used by the Go compiler to determine where to look for the go source files.
 So, for instance - consider the following go source file
 ```go
 // somefile.go
@@ -33,16 +33,16 @@ In order to use code/functionality defined in other packages in Go, we use the `
 
 ##### Package level members and visibility
 
-In a Go source file, package level members are any  memebers that are declared outside any function scope in the source file. For instance,
+In a Go source file, package level members are any members that are declared outside any function scope in the source file. For instance,
 
 ```go
 // somefile.go
 package user
 
-// MaxUsers constant is a package level memebrs
+// MaxUsers constant is a package level members
 const MaxUsers = 20
 
-// foo is a package level memeber
+// foo is a package level member
 func foo() {
     // function code
 }
@@ -57,11 +57,11 @@ func bar() {
 
 Package level members can be accessed by source Go files in other packages that import the package containing these members, provided the members have sufficient visibility.
 
-Go supports two levels of visibiilty - 
+Go supports two levels of visibility - 
 1. Package level visibility (the lowest level of visibility available)
-    - They are defined by naming the indentifier starting with a lowercase letter. Eg. `user`
+    - They are defined by naming the identifier starting with a lowercase letter. Eg. `user`
     - Such fields are reserved for use within the package.
-    - Any package level member can see any other package level memeber.    
+    - Any package level member can see any other package level member.    
 2. Public level visibility
     - They are defined by naming the identifier starting with an uppercase letter. Eg. `User`
     - Such fields can be used by any package member - within the same package as well as outside of the package.
@@ -93,7 +93,7 @@ type User struct {
 #### Initializing packages - the init function
 When running a Go program, the Go runtime looks for the main function and executes it directly. However, before the Go runtime executes the main function, it runs the `init()` function automatically.
 
-The `init()` function is responsible for performing initialization tasks such as setting up logging or creating global variables or any other tasks that must be done before the program starts. The Init function has the following propertties - 
+The `init()` function is responsible for performing initialization tasks such as setting up logging or creating global variables or any other tasks that must be done before the program starts. The Init function has the following properties - 
 1. Called by Go runtime
 2. Takes no argument
 3. No return value

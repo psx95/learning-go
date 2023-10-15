@@ -39,9 +39,9 @@ if test {
 }
 
 // if statement with optional initializer
-// Just like the for loop, the if statement also allows for an optional intitializer
+// Just like the for loop, the if statement also allows for an optional initializer
 // this initializer statement executes once before evaluating the test condition
-// the initialzer is only allowed on the opening if statement - i.e, it is not allowed 
+// the initializer is only allowed on the opening if statement - i.e, it is not allowed 
 // on the else-if statements
 if initializer; test {
     // set of statements

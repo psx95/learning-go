@@ -1,13 +1,13 @@
 ### Panic and Recovery in Go
 #### What is a Panic ?
 Panics in Go represent a condition where a program is no longer able to execute in a reliable manner. Panics can come from either the code that we have written or the Go runtime.
-When a panic occurs during the execution of an application, the entire application panics all the way up to the callstack, until it reaches the Go runtime. 
-In a basic panicking scenation, the Go runtime handles the panic by closing the application out and printing a message indicating what happened.
+When a panic occurs during the execution of an application, the entire application panics all the way up to the call-stack, until it reaches the Go runtime. 
+In a basic panicking scenario, the Go runtime handles the panic by closing the application out and printing a message indicating what happened.
 
 #### Recovery in Go
-Recovery mechanism in Go works with deferred functions and contains instructions that bring the application back to a stable execution environment. This works becuase when a panic occurs, it immediately exits the function, which invokes the deferred function (which was registered before invoking the function that caused the panic) containing instructions on how to recover from the panic. 
+Recovery mechanism in Go works with deferred functions and contains instructions that bring the application back to a stable execution environment. This works because when a panic occurs, it immediately exits the function, which invokes the deferred function (which was registered before invoking the function that caused the panic) containing instructions on how to recover from the panic. 
 
-*The end result being - due to the recoevry mechanism through the deferred function call, the panic did not propagate up the call stack.*
+*The end result being - due to the recovery mechanism through the deferred function call, the panic did not propagate up the call stack.*
 
 The above concepts of panic and recovery are demonstrated in the following Go code - 
 

@@ -22,8 +22,8 @@ type File struct { ... }
 // File implements Reader interface defined above since it models all the behavior expected of a Reader
 // We explicitly bind the Read method from Reader interface (uses same function signature) to the File
 // type within the File type definition, which makes File implement Reader.
-// NOTE: Interface implementation in Go is implicit, which means you do not have to explictly declare
-// type A implments B (like in other object oriented language)
+// NOTE: Interface implementation in Go is implicit, which means you do not have to explicitly declare
+// type A implements B (like in other object oriented language)
 func (f File) Read(b []byte) (n int, err error)
 
 // TCPConn implements Reader
@@ -65,7 +65,7 @@ var f2 File = r     // compile-time error, this is not allowed in Go
 // This works here since we know the underlying type in r is actually a File\
 f2 = r.(File)   // panics upon failure
 
-// Type assetion - avoiding panic when underlying type is unknown
+// Type assertion - avoiding panic when underlying type is unknown
 // the second parameter we accept here is a boolean, which indicates if the type
 // assertion we made here was correct or not. 
 //
@@ -83,6 +83,6 @@ switch v := r.(type) {
     case TCPConn:
         // v is now a TCPConn object
     default:
-        // like normal swicth statenents, handle if the interface does not match any concrete type.
+        // like normal switch statements, handle if the interface does not match any concrete type.
 }
 ```

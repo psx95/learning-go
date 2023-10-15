@@ -32,7 +32,7 @@ Channel operations block until complementary operations are ready. In other word
 This blocking behavior is what allows channels to synchronize goroutines and help them communicate with each other.
 
 **NOTE 2**
-Channels in Go can have nil values, an uninintialised channel variable has the value `nil`. 
+Channels in Go can have nil values, an un-initialized channel variable has the value `nil`. 
 If a message is sent to a nil channel, the Go application panics.
 
 #### Looping with Channels
@@ -72,7 +72,7 @@ for msg := range ch {
 func loopChannel() {
     ch := make(chan string, 3) // buffered channel
 
-    // in production code, we never want to use channels with syncronous code
+    // in production code, we never want to use channels with synchronous code
 
     for _, v := range[...]arr{"foo", "bar", "baz"} {
         // ch can hold up to 3 values since the buffer size is 3
@@ -129,12 +129,12 @@ select {
 #### Buffered and unbuffered channels
 
 ##### Unbuffered channels
-So far, the channels shown in the above code snippets are examples of unbuffered channels. Unbuffered channels do not have a buffer capacity to hold the messages. In other words, when sending a message in an unbuffered channel, the go scheduler will block the execution of the go code untill there is a reciever to consume the message from the channel.
+So far, the channels shown in the above code snippets are examples of unbuffered channels. Unbuffered channels do not have a buffer capacity to hold the messages. In other words, when sending a message in an unbuffered channel, the go scheduler will block the execution of the go code until there is a receiver to consume the message from the channel.
 
 The code listening for messages on the channel is blocked as well till there is a message available in the channel and as soon as there is a message available, the flow on both - the sender and the receiver side is unblocked.
 
 ##### Buffered channels
-Buffered channels have an internal buffer which is capable of holding a certain number of messages untill they are ready to be consumed by another receiver channel. This internal buffer prevents blocking the execution flow of the program since the channel itself acts like a receiver which immediately consumes the message. 
+Buffered channels have an internal buffer which is capable of holding a certain number of messages until they are ready to be consumed by another receiver channel. This internal buffer prevents blocking the execution flow of the program since the channel itself acts like a receiver which immediately consumes the message. 
 
 For instance, if a channel has a buffer size of 1 - this means that the channel is capable of holding 1 message in its internal buffer. This means, if a message is sent onto this channel, that message can be held in its internal buffer which can later be consumed by an external receiver. However, since the message is temporarily held in a buffer, the execution flow does not block and is therefore allowed to continue execution. 
 
@@ -144,7 +144,7 @@ var ch = make(chan string)
 
 func send() {
     // send message
-    ch  <- "message" // the control flow is blocked on this line till a reciever consumes message
+    ch  <- "message" // the control flow is blocked on this line till a receiver consumes message
 }
 
 func receive() {
@@ -163,21 +163,21 @@ func main() {
 // buffered channels
 var ch_b = make(chan string, 1) // the second parameter is the buffer capacity for messages
 
-// If ch_b is used in the send function, the send() function will not block till the reciever is ready,
-// instead, the send function immmediately exists since the channel can hold 1 message internally in its 
+// If ch_b is used in the send function, the send() function will not block till the receiver is ready,
+// instead, the send function immediately exists since the channel can hold 1 message internally in its 
 // internal buffer.
 // On the receiver side, things work similarly, since there is already a message on the internal buffer, 
-// the gorouting receives the messages from the buffer and completes.
-// This decouples the sending side of the channel from the recieving side of the channel.
+// the goroutine receives the messages from the buffer and completes.
+// This decouples the sending side of the channel from the receiving side of the channel.
 ```
-#### Directional and undirectional channels
+#### Directional and non-directional channels
 
-So far, the code samples and discussion above has to do with undirectional channels. Undirectional channels allow us to send, as well as receive messages from the same channel.
+So far, the code samples and discussion above has to do with non-directional channels. Non-directional channels allow us to send, as well as receive messages from the same channel.
 
-The undirectional nature of channels can sometimes lead to code that is unclear or hard to read which can often increase the chances of introducing bugs in the program since the channels maybe used incorrectly. To prevent such situations, Go allow us to use directional channels.
+The non-directional nature of channels can sometimes lead to code that is unclear or hard to read which can often increase the chances of introducing bugs in the program since the channels maybe used incorrectly. To prevent such situations, Go allow us to use directional channels.
 
-Directional channels work only one-way - by making a channel a directional channel, we force it to either be a send-only channel or be a receive-only cahnnel. This leads to more readable code as the intent of the channel is clear.
-Additionaly, receiving on a send-only channel or sending to a receive-only channel leads to a compile-time error.
+Directional channels work only one-way - by making a channel a directional channel, we force it to either be a send-only channel or be a receive-only channel. This leads to more readable code as the intent of the channel is clear.
+Additionally, receiving on a send-only channel or sending to a receive-only channel leads to a compile-time error.
 
 The following code snippet shows how to create directional channels: 
 

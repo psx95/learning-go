@@ -7,10 +7,10 @@ actual concrete type.
 So taking the example of Go `File` (concrete type) and `io.Reader` (interface type), we could write a generic function, within which a `File` type could work as an interface type - (`io.Reader`),
 but outside the function, the file object is retains its identity as a `File` type. 
 
-Such a function is able to work on any `io.Reader` implementation, but does not cauase the concrete type to loose its concrete identity - at the end of the function a `File` object remains a `File`
+Such a function is able to work on any `io.Reader` implementation, but does not causes the concrete type to loose its concrete identity - at the end of the function a `File` object remains a `File`
 and a `TCPConn` object (*a type from Go standard library which also implements the `io.Reader` interface*) would remain a `TCPConn` object. 
 
-#### Creaating a generic function in Go -
+#### Creating a generic function in Go -
 
 ```go
 intArr := []int64{0, 1, 2}
@@ -29,7 +29,7 @@ anotherArr := foo(intArr)
 
 // Creating a generic version of foo that takes in a slice of type 'V'
 // the '[V any]' after the function name in the signature is called the type constraint.
-// In this function type constraint on type V is 'any', which means V can asssume any type
+// In this function type constraint on type V is 'any', which means V can assume any type
 func bar[V any](arr []V) []V {
     result := make([]V, len(arr))
     // function code to process arr
@@ -49,7 +49,7 @@ There are only two builtin interfaces in go that can be used as type constraints
 
 ```go
 // Since type constraints for generic functions are basically interfaces, we can create a custom interface and use it as a constraint.
-// However this interface would be a litte different from the behavioral interfaces that we typically create since rather that defining
+// However this interface would be a little different from the behavioral interfaces that we typically create since rather that defining
 // behavior on implementing types, such an interface will define the concrete types (basically the types that would satisfy the constraints) -
 
 // Consider the following function that adds elements in an int slice using '+' operator

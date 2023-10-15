@@ -1,5 +1,5 @@
 ### Errors in Go
-Errors in Go are unexpected situation that may arise when running an application. It is reasonable to expect errors especially when running an application at scale - for instace, a web server serving millions of requests. 
+Errors in Go are unexpected situation that may arise when running an application. It is reasonable to expect errors especially when running an application at scale - for instance, a web server serving millions of requests. 
 "Errors are Values" - in Go, errors should be treated as legitimate values returned from a function and should therefore not be ignored. Instead, it is better if these errors are handled immediately. Handling errors immediately leads to a more stable production code and increases error visibility in the program.
 
 #### Error handling

@@ -1,14 +1,14 @@
 ### Variables in Go
 
 #### Declaration and Initialization
-Variabels in Go are declared using the keyword `var`. There are various ways to declare and initialize variables in Go - 
+Variables in Go are declared using the keyword `var`. There are various ways to declare and initialize variables in Go - 
 
 ```go
 var name string         // declare variable
 var name string = "psx" // declare and initialize
 
 var name = "psx"        // declare and initialize with inferred type
-myNmae := "psx"         // shorthand for declaration and initialization with inferred type
+myName := "psx"         // shorthand for declaration and initialization with inferred type
 
 a, b := 10, 5           // Go allows multiple variables to be initialized all at once
 
@@ -73,9 +73,9 @@ const (
 )
 ```
 
-In case of implicitly typed constants in Go, Go treats the constants as a literal value, so in the example above, `a` will be treated as a literal value, so whereever we use `a` in the program, Go will simply copy the value `42` in its place. This means we could use `a` to assign a floating point value as well - which would not be possible in case of variables.
+In case of implicitly typed constants in Go, Go treats the constants as a literal value, so in the example above, `a` will be treated as a literal value, so wherever we use `a` in the program, Go will simply copy the value `42` in its place. This means we could use `a` to assign a floating point value as well - which would not be possible in case of variables.
 
-In constrast, in case of explicitly typed constant, like `name`, it can only ever be assigned where a `string` datatype is allowed. 
+In contrast, in case of explicitly typed constant, like `name`, it can only ever be assigned where a `string` datatype is allowed. 
 
 ##### Notes
 1. Regarding iota - `iota` is a special symbol in Go that is used in the context of assigning the constants. `iota` has a value that is related to its position in a constant group and `iota`'s value at the first position in a constant group is `0`. The value of `iota` resets between each constant block. 

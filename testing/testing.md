@@ -25,7 +25,7 @@ Go has built-in support for various kinds of testing for applications.
 3. The test function in the test file starts with a prefix `Test`. It can be followed with any text but the text should start with a capital letter.
 4. The test function receive a pointer to a testing object - `*testing.T`. This pointer is used to convey the status for the current test back to the Go runtime.
 5. Unlike most other languages, Go does not have built-in assertions for the tests we write. 
-    - To fail a test we can report an error on the paramater `t *testing.T` like - `t.Errorf()` 
+    - To fail a test we can report an error on the paramter `t *testing.T` like - `t.Errorf()` 
     - If there is no failure, test is assumed to have passed.
 6. To run Go tests -
     ```shell
@@ -57,7 +57,7 @@ Go provides multiple ways to report a test failure, but they are broadly divided
 This means that the some test conditions failed, but the test is still valid and so other conditions may still be checked - the test function keeps running.
 Methods to indicate this kind of failure -
 1. `t.Fail()` - Simply marks test as failed and moves on
-2. `t.Error(...interface{})` - Same as fail, but allows the user to pass additional information through the variatic interfaces.
+2. `t.Error(...interface{})` - Same as fail, but allows the user to pass additional information through the variadic interfaces.
 3. `t.Errorf(string, ...interface{{})` - Same as error, but allows the user to pass a formatted string instead of raw input types.
 *Note: Each of these methods have a corresponding method which results in the immediate failure of the test. This is discussed below.*
 

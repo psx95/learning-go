@@ -5,7 +5,7 @@ All loops in Go are `for` loops, but there are different forms of the loop avail
  - counter based loops
 
  #### Important Notes
-  - `break` statement can be used to exit eary from the loops.
+  - `break` statement can be used to exit early from the loops.
 
  #### Common loop operations in Go
  ```go
@@ -52,7 +52,7 @@ All loops in Go are `for` loops, but there are different forms of the loop avail
 
  #### Looping through collections
  Unlike basic looping where we can loop till some condition evaluates to false, when looping through collections, Go has built-in signals that
- indicate when the program has iterated over every memeber of the collection once.
+ indicate when the program has iterated over every member of the collection once.
 
  In Go, the `range` keyword indicates that we are looping through collections. The collections here can be - 
  1. arrays

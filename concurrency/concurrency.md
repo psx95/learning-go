@@ -2,7 +2,7 @@
 #### Concurrency vs Parallelism
 Concurrency is not parallelism. Concurrency means that our application can do more than 1 thing at a time. It doesn't necessarily mean that it will. 
 
-Parallelism is the act of executing more than one task at the same time. This means without concurrnecy, we cannot have parallelism.
+Parallelism is the act of executing more than one task at the same time. This means without concurrency, we cannot have parallelism.
 
 Putting the above together, in Go, we can write concurrent programs, but we cannot force them to run in parallel. This is decided by the OS and the Go runtime environment.
 The main difference between the concept of concurrency and parallelism is that parallelism implies that multiple tasks run simultaneously, at the same time. Concurrency means that while multiple tasks may be running simultaneously, only one of them would be actively worked on at a given time (basically keep switching between the tasks). 
@@ -16,13 +16,13 @@ For example, if we have 3 tasks - Task 1, 2, 3.
 
  So while there are 3 concurrent task (tasks running simultaneously), only 1 of them ever gets worked on at a given point in time. 
 
- In cotrast, if we have 3 tasks running parallely - Task 1, 2, 3, it would mean that all 3 of them are being worked on simultaneously.
+ In contrast, if we have 3 tasks running in parallel - Task 1, 2, 3, it would mean that all 3 of them are being worked on simultaneously.
 
 #### CSP (Communicating Sequential Processes)
 CSP is the idea of breaking the program into discrete execution units of work (or tasks) which some processes can execute sequentially. So basically one process does some work and then passes the result of that work to something called a `channel`. 
 Another process receives that result from this channel and then does some additional work on it (or finishes it) and so on. So these processes are communicating with each other via channels in a sequential manner - which is the main idea behind CSP.
 
-The use of this model is that the processes are independent of each other and can work concurrently as long as there is some syncronization mechanism in place that makes sure of the sequential communication. So CSP makes concurrency patterns like `fan-in`
+The use of this model is that the processes are independent of each other and can work concurrently as long as there is some synchronization mechanism in place that makes sure of the sequential communication. So CSP makes concurrency patterns like `fan-in`
 and `fan-out` easy to implement.
 
 In context of Go language in particular, the processes described above are called `goroutine`s which can communicate with each other via `channel`s.
@@ -38,7 +38,7 @@ func main() {
     // Some code
     
     // This is a goroutine
-    // It is merely an anonymouos inline function that has the keyword 'go' in before the 'func' keyword.
+    // It is merely an anonymously inline function that has the keyword 'go' in before the 'func' keyword.
     // The 'go' keyword is responsible for creating goroutines, without the go keyword, this would just be
     // an inline anonymous function.
     go func() {
@@ -69,7 +69,7 @@ A comparison between a goroutine and a thread can be summarized in the table bel
 | thread  | goroutine |
 | -------| ------ |
 | Have their own execution stack | Have their own execution stack |
-| Fixed stack space (~1MB) | Variable stack space (~starts at 2KB, max upto ~ 2GB) |
+| Fixed stack space (~1MB) | Variable stack space (~starts at 2KB, max up-to ~ 2GB) |
 | Managed by OS (slightly more efficient, since no scheduler overhead) | Managed by Go runtime |
 | Relatively expensive (interactions between OS and the program) | Inexpensive since its managed by runtime, need only talk to the go runtime |
 
@@ -83,7 +83,7 @@ Broadly speaking, there are 3 main stages in the lifecycle of a goroutine -
 However, since goroutines are scheduled for execution by the scheduler, this means whenever a goroutine is not scheduled to run on a thread by the scheduler - it is in a *blocking* state. This simply means the goroutine while created, is not doing anything.
 Whenever the goroutine is scheduled to run on a thread by the scheduler, go routine moves to a *running* state. In the execution phase, the goroutine may switch between these two states, depending on the kind of work it is doing. 
 
-For instance, if a goroutine is waiting on some input from the user, the scheduler may unschedule it from an OS thread - causing the goroutine to move to a *blocking* state, once it recieves the input, the scheduler would move the goroutine back to the *running* state.
+For instance, if a goroutine is waiting on some input from the user, the scheduler may unschedule it from an OS thread - causing the goroutine to move to a *blocking* state, once it receives the input, the scheduler would move the goroutine back to the *running* state.
 
 Some other examples of why a goroutine might move to a blocking state include: 
  - The goroutine maybe waiting on a system call. Eg - the goroutine might be creating a file, which is a system call, in this case the goroutine will have to wait till the system call is complete. 

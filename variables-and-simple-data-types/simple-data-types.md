@@ -9,13 +9,13 @@ There are only 4 simple data types
  #### Strings
 
  Collection of 1 or more UTF-8 code points. There are 2 flavors - 
-  - quoted string (delimited by double quotes) - represents an interpretted string
+  - quoted string (delimited by double quotes) - represents an interpreted string
     ```
-    "this is interpretted string, \n it interprets escape characters"
+    "this is interpreted string, \n it interprets escape characters"
 
     If this is printed to the console, this will be the output - 
 
-    this is interpretted string, 
+    this is interpreted string, 
     it interprets escape characters
 
     (Notice the newline)
@@ -60,12 +60,12 @@ There are only 4 simple data types
  #### Booleans
 
  Similar to booleans in other languages - there are 2 values `true` and `false` which are also first-class citizens in go which means they are not 
- represention of any numbers.
+ representation of any numbers.
 
  #### Errors
 
 The error type in go is an interface. It has the ability to report an error using a function named `Error()` which returns a string.
 
 #### NOTES
-1. The [builtin](https://pkg.go.dev/builtin) exposes a lot of the functionality that is built in to Go. This package does not need to be imported since its gloablly available in all
+1. The [builtin](https://pkg.go.dev/builtin) exposes a lot of the functionality that is built in to Go. This package does not need to be imported since its globally available in all
 Go programs. This package also exposes all the simple data types that are mentioned above.

@@ -18,7 +18,7 @@ func main() {
 			m.Lock()
 			defer m.Unlock()
 			// if we did not acquire lock in this goroutine,
-			// ocassionally multiple goroutines could run simultaneously and
+			// occasionally multiple goroutines could run simultaneously and
 			// therefore access the memory of 's' at the same time, when that
 			// happens, only one of the operation would take effect, since both
 			// goroutines would access the same value of 's' and overwrite each

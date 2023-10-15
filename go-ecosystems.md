@@ -21,7 +21,7 @@ Gopls is maintained by the core Go team.
  - Gin
     - Lightweight web services framework. Primarily used for routing the requests to request handlers. Makes generating JSON, XML or CSV easy for responses.
  - Gorilla Toolkit
-    - Not a framework, but has interoperating, independent tools for routing, session management, URL creation, management of web sockets, etc. Avoids framework login.
+    - Not a framework, but has inter-operating, independent tools for routing, session management, URL creation, management of web sockets, etc. Avoids framework login.
 
 ##### CLI Applications
  - Cobra 

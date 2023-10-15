@@ -1,8 +1,8 @@
 ### Contexts in Go
-Contexts in Go were added as a means to convey the cancellations/completion of goroutines to other related goroutines effectively. So if a gourinte spaws multiple other goroutines which should all cancel/stop executing if the parent goroutine has stopped, this can be done using the context.
+Contexts in Go were added as a means to convey the cancellations/completion of goroutines to other related goroutines effectively. So if a goroutine spawns multiple other goroutines which should all cancel/stop executing if the parent goroutine has stopped, this can be done using the context.
 Communicating the cancellation effectively and early is possible so that unnecessary goroutines do not keep running and waste resources.
 
-In Go, we derive contexts from existing contexts to form a context tree, so if an upstream context cancels, all the derived contexts also recieve that cancellation signal and are cancelled.
+In Go, we derive contexts from existing contexts to form a context tree, so if an upstream context cancels, all the derived contexts also receive that cancellation signal and are cancelled.
 
 #### Creating contexts in Go
 As mentioned above, in Go, we create contexts from existing contexts. The `context` package provide us three methods to create derived contexts -  `WithCancel`, `WithDeadline` and `WithTimeout`. All of these functions take in an existing context as the parameter.
@@ -13,7 +13,7 @@ Since the `context.Context` is an interface type in Go, in order to get existing
 
 #### Caveats when using Contexts
 1. Canceling contexts doesn't necessarily mean that the goroutines should immediately terminate what they're doing.
-2. Canceling contexts doesn't cause the goroutines using that context to stop. Canceling contexts, merely sends a signal to all the child contexts and it is the responsibility of the programmer to actually check for the cancelation and exit the goroutine.
+2. Canceling contexts doesn't cause the goroutines using that context to stop. Canceling contexts, merely sends a signal to all the child contexts and it is the responsibility of the programmer to actually check for the cancellation and exit the goroutine.
 
 #### Conventions around the context in Go
 When using contexts in Go, there are the following conventions around its use -
@@ -23,5 +23,5 @@ When using contexts in Go, there are the following conventions around its use -
 
 #### Using contexts in Go
 To see samples of how contexts are used in code checkout -
-1. [context with cancel](../demo-programs/context-cancel-example/main.go) sameple
+1. [context with cancel](../demo-programs/context-cancel-example/main.go) sample
 2. [context with timeout](../demo-programs/context-timeout-example/main.go) sample
