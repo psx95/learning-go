@@ -45,10 +45,19 @@ func main() {
         fmt.Println("An async task scheduled by the Go scheduler")
     }()
 
-    // NOTE: This goroutine in its current form here will not do anything. This is because declaring it here just
+    // This is also a goroutine, but this indicates the Go scheduler to run the function `foo` as a goroutine.
+    // Named functions can also be run as goroutines.
+    go foo()
+
+    // NOTE: This goroutine(s) in its current form here will not do anything. This is because declaring it here just
     // informs the Go scheduler that there is a concurrent task that needs to be performed, but the program gets
     // terminated on the next line, which means the scheduler did not have any time to execute this goroutine.
     // WaitGroups can help here - they are explained in the next section.
+}
+
+func foo() {
+    // Some code
+    // ...
 }
 ```
 
