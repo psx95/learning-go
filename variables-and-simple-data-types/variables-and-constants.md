@@ -26,7 +26,7 @@ a, b := 10, 5           // Go allows multiple variables to be initialized all at
 
 
 #### Type conversion
-Go **does not support implicit conversions between data types***. If a type conversion is required, it has to be explicit. So for instance, 
+Go **does not support implicit conversions between data types**. If a type conversion is required, it has to be explicit. So for instance, 
 
 ```go
 var i int = 5   // declare and initialize
@@ -35,6 +35,9 @@ var f float32   // declare
 f = i           // ERROR - implicit conversion not allowed in Go and will result in an error.
 f = float32(i)  // Have to be explicit with the intent to convert to a different type.
 ```
+
+##### Related Note
+Go allows you to *unpack* the concrete type from an interface type via [type-assertions](../object-orientation-polymorphism/interfaces.md#type-assertions---get-concrete-type-from-interface-type). This is not exactly a type coversion, but can come handy when dealing with interfaces and their subtypes.
 
 ### Constants in Go
 Constants in Go are declared using the `const` keyword. Constants cannot change values once they are initialized and the value of the constant has to be determinable at compile time. Unlike variables constants do not need to be declared locally and so we can have unused constants in a Go program without any compile-time errors.
