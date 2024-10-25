@@ -11,9 +11,12 @@ Similar to an array, but allows for custom index (or *key*) types to reference v
 
 #### Common Map Operations in Go
 ```go
-// Declaring a map in Go
+// Declaring a map in Go - this will not initialize a map
 var m map[string]int        // the value in the [] indicates the key type and "int" indicates value type
 fmt.Println(m)              // map[] - like slices, this indicates a nil value
+
+// Use the builtin make method to create an initialized map
+initializedMap := make(map[string]int)
 
 var referemcemap map[string][]string  // a map of string -> slice of strings
 
